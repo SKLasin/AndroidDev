@@ -34,21 +34,47 @@ class MyFirstPageState extends State<MyFirstPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              //TODO: Replace this Text Widget
-              // and build the label and switch here
-              // as children of the row.
-              Text('testing 1 2 3 '),
+              // Switch Widget
+              const Text('Enable Buttons'),
+              Switch(
+                value: enabled,
+                onChanged: (bool value) {
+                  setState(() {
+                    enabled = value;
+                  });
+                },
+              ),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              //TODO: Build the two buttons here 
-              // as children of the row.
-              // For each button use a 
-              // "Visibility Widget" and its child 
-              // will be an "ElevatedButton"
-              
+              // Left Button
+              Visibility(
+                visible: enabled,
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      timesClicked++;
+                      msg1 = 'Clicked $timesClicked';
+                    });
+                  },
+                  child: Text(msg1.isEmpty ? 'Click Me' : msg1),
+                ),
+              ),
+              // Right Button
+              Visibility(
+                visible: enabled,
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      timesClicked = 0;
+                      msg1 = 'Click Me';
+                    });
+                  },
+                  child: Text('Reset'),
+                ),
+              ),
             ],
           ),
           const SizedBox(
@@ -60,15 +86,41 @@ class MyFirstPageState extends State<MyFirstPage> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  //TODO: Build the text form field
-                  // here as the first
-                  // child of the column.
-                  // Include as the second child
-                  // of the column
-                  // a submit button that will show a
-                  // snackbar with the "firstName"
-                  // if validation is satisfied.
-                  
+                  // Text Form Field
+                  TextFormField(
+                    controller: textEditingController,
+                    decoration: InputDecoration(
+                      hintText: 'first name',
+                      labelText: 'Enter your first name',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty || value.length > 10) {
+                        return 'Enter a name between 1 and 10 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  // Submit Button
+                  ElevatedButton(
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Hey There, Your name is ${textEditingController.text}'),
+                            duration: const Duration(seconds: 5),
+                            action: SnackBarAction(
+                              label: 'Undo',
+                              onPressed: () {
+                                print('Snackbar action button was clicked!');
+                              },
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: Text('Submit'),
+                  ),
                 ],
               ),
             ),
