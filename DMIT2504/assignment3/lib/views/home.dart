@@ -60,8 +60,17 @@ class HomeViewState extends State<HomeView> {
               },
             ),
             Expanded(
-              //TODO: Replace this Text child with a ListView.builder
-              child: Text('Hi'),
+              child: ListView.builder(
+                itemCount: stockList.length,
+                itemBuilder: (context, index) {
+                  var stock = stockList[index];
+                  return ListTile(
+                    title: Text(stock['symbol']),
+                    subtitle: Text(stock['name']),
+                    trailing: Text('\$${stock['price']}'),
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -92,26 +101,22 @@ class HomeViewState extends State<HomeView> {
                     var companyName = '';
                     var price = '';
                     try {
-                      //TODO:
-                      //Inside of this try,
-                      //get the company data with
-                      //stockService.getCompanyInfo,
-                      //then get the stock data with
-                      //stockService.getQuote,
-                      //but remember you must use await,
-                      //then if it is not null,
-                      //dig out the symbol, companyName, and latestPrice,
-                      //then create a new object of
-                      //type Stock and add it to
-                      //the database by calling
-                      //databaseService.insertStock,
-                      //then get all the stocks from
-                      //the database with
-                      //databaseService.getAllStocksFromDb and
-                      //attach them to stockList,
-                      //then print all stocks to the console and,
-                      //finally call setstate at the end.
-                      
+                      var companyInfo =
+                          await stockService.getCompanyInfo(stockSymbol);
+                      var quoteInfo = await stockService.getQuote(stockSymbol);
+                      if (companyInfo != null && quoteInfo != null) {
+                        var stockData = {
+                          'symbol': stockSymbol,
+                          'name': companyInfo['Name'] ?? 'N/A',
+                          'price': quoteInfo['05. price'] ?? 'N/A',
+                        };
+                        await databaseService.insertStock(stockData);
+                        stockList = await databaseService.getAllStocksFromDb();
+                        print('All stocks: $stockList');
+                        setState(() {});
+                      } else {
+                        print('No data available for symbol: $stockSymbol');
+                      }
                     } catch (e) {
                       print('HomeView inputStock catch: $e');
                     }

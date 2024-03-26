@@ -6,17 +6,15 @@ import '../services/network.dart';
 const apiToken = 'QTVXCOASBD3ZIC1J';
 
 class StockService {
-
   Future getCompanyInfo(String symbol) async {
-
-    var urlUsingOneString = Uri.parse('https://www.alphavantage.co/query?function=OVERVIEW&symbol=$symbol&apikey=$apiToken');
+    var urlUsingOneString = Uri.parse(
+        'https://www.alphavantage.co/query?function=OVERVIEW&symbol=$symbol&apikey=$apiToken');
 
     Uri url = Uri(
-      scheme: 'https',
-      host: 'www.alphavantage.co',
-      path: '/query',
-      query: 'function=OVERVIEW&symbol=$symbol&apikey=$apiToken'
-    );
+        scheme: 'https',
+        host: 'www.alphavantage.co',
+        path: '/query',
+        query: 'function=OVERVIEW&symbol=$symbol&apikey=$apiToken');
     print('url: $url');
     NetworkService networkService = NetworkService(url);
     var data = await networkService.getData();
@@ -25,13 +23,26 @@ class StockService {
   }
 
   Future getQuote(String symbol) async {
-    //TODO: Complete this method.
-    var url = Uri.parse('');
+    try {
+      var url = Uri.parse(
+          'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=$symbol&apikey=$apiToken');
 
-    print('url: $url');
-    NetworkService networkService = NetworkService(url);
-    var data = await networkService.getData();
-    print(data);
-    return data;
+      print('url: $url');
+      NetworkService networkService = NetworkService(url);
+      var data = await networkService.getData();
+      print(data);
+
+      if (data != null && data['Global Quote'] != null) {
+        var quoteData = data['Global Quote'];
+        print(quoteData);
+        return quoteData;
+      } else {
+        print('No quote data available for symbol: $symbol');
+        return {};
+      }
+    } catch (e) {
+      print('StockService getQuote error: $e');
+      return {};
+    }
   }
 }
